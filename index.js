@@ -94,8 +94,6 @@ if(cluster.isMaster) {
 
         await App.start();
 
-        const DB = require('./modules/database/Database');
-        await DB.init();
 
         App.on('error', (error) => {
             console.log('ERR', error);

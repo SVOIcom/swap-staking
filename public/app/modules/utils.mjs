@@ -1,19 +1,3 @@
-/*_______ ____  _   _  _____
- |__   __/ __ \| \ | |/ ____|
-    | | | |  | |  \| | (_____      ____ _ _ __
-    | | | |  | | . ` |\___ \ \ /\ / / _` | '_ \
-    | | | |__| | |\  |____) \ V  V / (_| | |_) |
-    |_|  \____/|_| \_|_____/ \_/\_/ \__,_| .__/
-                                         | |
-                                         |_| */
-/**
- * @name TONSwap project - tonswap.com
- * @copyright SVOI.dev Labs - https://svoi.dev
- * @license Apache-2.0
- * @version 1.0
- */
-
-
 const utils = {
     /**
      * Shorten pubkey or address
@@ -37,6 +21,7 @@ const utils = {
         }
         return result;
     },
+    EMPTY_TON_ADDRESS: '0:0000000000000000000000000000000000000000000000000000000000000000',
     /**
      * Transfer hack ABI
      */
@@ -105,7 +90,7 @@ const utils = {
             return '0';
         }
 
-        return String(amount.toFixed(precision));
+        return String(BigNumber(amount).toFixed(precision));
     },
     /**
      * Js number to raw unsigned number
@@ -114,7 +99,6 @@ const utils = {
      * @returns {number}
      */
     numberToUnsignedNumber(num, decimals = 9) {
-        decimals = Number(decimals);
         if(decimals === 0) {
             return BigNumber(num).toFixed(decimals);
         }
@@ -127,7 +111,6 @@ const utils = {
      * @returns {number}
      */
     unsignedNumberToSigned(num, decimals = 9) {
-        decimals = Number(decimals);
         if(decimals === 0) {
             return BigNumber(num).toFixed(decimals);
         }
@@ -140,38 +123,6 @@ const utils = {
      */
     bigNumberToString(number) {
         return Number(number).toLocaleString('en').replace(/,/g, '');
-    },
-    /**
-     * @param {number} num
-     * @param {number} decimals
-     */
-    numberToPretty(num, length = 6) {
-        let letter = '';
-        let str = BigNumber(num || 0);
-        if(!str.isFinite()) {
-            str = BigNumber(0);
-        }
-        if(str >= 1e9) {
-            str = (str / 1e9)
-            letter = 'b';
-        } else if(str >= 1e6) {
-            str = (str / 1e6)
-            letter = 'm';
-        }
-
-        str = str.toPrecision(length);
-        if(str.includes('e')) {
-            str = BigNumber(str).toFixed(0);
-        }
-
-        if(str.includes('.')) {
-            str = str.replace(/0+$/g, '').replace(/\.$/g, '');
-        }
-
-        if(str.replace('.', '').length < 3) {
-            str = BigNumber(str).toPrecision(3);
-        }
-        return str + letter;
     },
     /**
      * Extract transaction id
@@ -209,17 +160,45 @@ const utils = {
         }).join(""));
     },
 
-
     /**
-     * Create tvm cell payload with public key
-     * @param pubkey
-     * @returns {string}
+     * Async JSONP
+     * @async
+     * @param url
+     * @param callback
+     * @returns {Promise<unknown>}
      */
-    createPubkeyTVMCELL(pubkey) {
-        let data = 'b5ee9c720101010100' + '22000040' + pubkey;
-        return this.hexToBase64(data);
+    jsonp(url, callback = "jsonpCallback_" + String(Math.round(Math.random() * 100000))) {
+        return new Promise((resolve, reject) => {
+            try {
+                let script = document.createElement("script");
+
+                window[callback] = function (data) {
+                    window[callback] = undefined;
+                    resolve(data);
+                };
+                script.src = `${url}?callback=${callback}`;
+                document.body.appendChild(script);
+            } catch (e) {
+                reject(e);
+            }
+        });
     },
 
+    /**
+     * Get JSON file
+     * @param {string} url
+     * @param {boolean} local
+     * @returns {Promise<any>}
+     */
+    async fetchJSON(url, local = false) {
+        if(url.includes('file:') || local) {
+            if(!url.includes('file:') && window._isApp) {
+                url = 'file:///android_asset/www' + url;
+            }
+            return await (await this.fetchLocal(url)).json();
+        }
+        return await ((await fetch(url))).json();
+    },
     /**
      * Hex encoded string to string
      * @param {string} hexString
@@ -237,31 +216,68 @@ const utils = {
     string2Hex(str) {
         return Buffer.from(str, 'utf8').toString('hex');
     },
-    copyToClipboard: async (text) => {
-        await navigator.clipboard.writeText(text);
-    },
-    selfCopyElement: function (dataAttribName = 'copy') {
-        return function () {
-            let data = $(this).data(dataAttribName);
-            utils.copyToClipboard(data);
-        }
+
+    /**
+     * Create tvm cell payload with public key
+     * @param pubkey
+     * @returns {string}
+     */
+    createPubkeyTVMCELL(pubkey) {
+        let data = 'b5ee9c720101010100' + '22000040' + pubkey;
+        return this.hexToBase64(data);
     },
 
-    setupSelfCopyElements: (selector = '.copy', dataAttrib = 'copy') => {
-        $(selector).click(utils.selfCopyElement(dataAttrib));
-        $(selector).parent().find('.duplicateButton').click(function () {
-            $(this).parent().find('.copy').click();
+    /**
+     * Returns random id
+     * @returns {number}
+     */
+    randomId() {
+        return Math.round(Math.random() * 1000000);
+    },
+
+    /**
+     * Simple async wait
+     * @param timeout
+     * @async
+     * @returns {Promise<unknown>}
+     */
+    wait: (timeout = 1000) => {
+        return new Promise(resolve => {
+            setTimeout(resolve, timeout);
         })
     },
-    /**
-     * Get JSON file
-     * @param {string} url
-     * @param {boolean} local
-     * @returns {Promise<any>}
-     */
-    async fetchJSON(url, local = false) {
-        return await ((await fetch(url))).json();
+
+    async resolveArrayPromises(from = 0, to, generator = (index) => {
+    }) {
+        let promises = [];
+        for (let i = from; i < to; i++) {
+            promises.push(generator(i));
+        }
+
+        return await Promise.all(promises);
     },
+
+    fixZeroes(str) {
+        str = String(str);
+        if(!str.includes('.')) {
+            return str;
+        }
+
+        str = str.replace(/0*$/g, '');
+
+        if(str.substr(-1) === '.') {
+            str = str.substr(0, str.length - 1);
+        }
+        return str;
+    },
+
+    capitalize(str) {
+        let first = str.substr(0, 1).toUpperCase();
+        let second = str.substr(1).toLowerCase();
+
+        return first + second
+    }
+
 
 }
 export default utils;

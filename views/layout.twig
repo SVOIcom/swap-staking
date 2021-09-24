@@ -16,20 +16,20 @@
     <div class="header__container">
         <div class="header-logo">
             <img class="header-logo__logo" src="/img/logo.png" alt="">
-            <p class="header-logo__name">SWAP Explorer</p>
+            <p class="header-logo__name">SWAP Staking</p>
         </div>
         <div class="header-menu header-menu_full">
             <ul class="header-menu__list">
                 <li class="header-menu__list-item">
                     <a class="header-menu__list-link {{ controllerName == 'index'?'header-menu__list-link_active':'' }} "
-                       href="/">Overview</a>
+                       href="/">Staking</a>
                 </li>
                 <li class="header-menu__list-item">
-                    <a class="header-menu__list-link {{ controllerName == 'token'?'header-menu__list-link_active':'' }}" href="/token">Tokens</a>
+                    <a class="header-menu__list-link {{ controllerName == 'token'?'header-menu__list-link_active':'' }}" href="https://swap.block-chain.com">Swap</a>
                 </li>
                 <li class="header-menu__list-item">
                     <a class="header-menu__list-link {{ controllerName == 'pair'?'header-menu__list-link_active':'' }}"
-                       href="/pair">Pairs</a>
+                       href="https://swap-explorer.block-chain.com/">Explorer</a>
                 </li>
                {#  <li class="header-menu__list-item">
                     <a class="header-menu__list-link" href="#">Accounts</a>
@@ -116,9 +116,14 @@
     }catch (e){}
 </script>
 
-<script src="/ton/main.js"></script>
-<script src="/app/app.mjs" type="module"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
+
+
+<script src="/app/App.mjs" type="module"></script>
 {# <script src="/js/chart.mjs"type="module"></script> #}
+
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
 
 </body>
 </html>

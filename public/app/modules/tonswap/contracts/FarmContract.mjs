@@ -35,8 +35,14 @@ class FarmContract {
 
     async getUserAccountAddress(walletAddress) {
         return (await this.contract.getUserAccountAddress({_answer_id: 0, userAccountOwner: walletAddress})).value0;
-        
+
     }
+
+    async deployUserAccountPayload(walletAddress){
+        return await this.contract.deployUserAccount.payload({userAccountOwner: walletAddress});
+    }
+
+
 }
 
 

@@ -92,19 +92,12 @@ async function main() {
     window.TON = TON;
 
 
-    let farmContract = await (new FarmContract(TON, CONFIG)).init(CONFIG.stakingContract);
-    window.farmContract = farmContract;
 
-    let userAccountAddress = await farmContract.getUserAccountAddress((await TON.getWallet()).address)
-
-
-    let userAccount = await (new UserAccount(TON, CONFIG)).init(userAccountAddress);
-    window.userAccount = userAccount;
 
     let page = await (new Page(undefined, undefined, {
         pageContainer: $('#pageContent'),
         containerPolicy: 'replace'
-    })).loadHtml($('#pageContent').html());
+    })).loadHtml($('#pageContent').html(),{CONFIG, TON});
     await page.show();
     window.page = page;
 

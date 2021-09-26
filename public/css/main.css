@@ -342,7 +342,7 @@ b, strong {
     max-width: 1920px;
 }
 
-.button {
+.button, .btn {
     font-family: 'TT Hoves', sans-serif;
     background: transparent;
     margin: 0;
@@ -360,14 +360,14 @@ b, strong {
     z-index: 1;
 }
 
-.button:hover {
+.button:hover, .btn:hover {
     -webkit-transition: 0.3s;
     -o-transition: 0.3s;
     -moz-transition: 0.3s;
     transition: 0.3s;
 }
 
-.button_l-blue {
+.button_l-blue, .btn-primary {
     background: #ffffff;
     color: #828282;
     text-align: center;
@@ -378,11 +378,11 @@ b, strong {
     border: 1px solid #ebad44;
 }
 
-.button_l-blue:hover {
+.button_l-blue:hover, .btn-primary:hover {
     background: #e7f1f7;
 }
 
-.button_blue {
+.button_blue, .btn-primary {
     background: #ebad44;
     border-radius: 50px;
     color: #fff;
@@ -394,7 +394,13 @@ b, strong {
     color: #bfbfbf !important;
 }
 
-.button_blue:hover {
+.btn-primary.disabled {
+    opacity: 1 !important;
+    background: #f6f7f9 !important;
+    color: #bfbfbf !important;
+}
+
+.button_blue:hover, .btn-primary:hover {
     background: #ffa918;
 }
 
@@ -9258,4 +9264,18 @@ input[type="number"] {
         width: 90%;
 
     }
+}
+
+.btn{
+    padding: 15px;
+    display: inline-block;
+}
+
+.modal-content{
+    background: #434343;
+}
+
+.modal-backdrop {
+    width: 200vw;
+    height: 200vh;
 }

@@ -51,10 +51,32 @@ class UserAccount {
     }
 
     async getAllUserFarmInfo() {
-        return (await this.contract.getAllUserFarmInfo({_answer_id: 0}));
+        return (await this.contract.getAllUserFarmInfo({_answer_id: 0})).value0;
     }
 
+    async getUserFarmInfo(farm) {
+        let farmData = (await this.contract.getUserFarmInfo({_answer_id: 0, farm})).value0;
+        farmData.pendingReward = Number(farmData.pendingReward);
+        farmData.rewardPerTokenSum = Number(farmData.rewardPerTokenSum);
+        farmData.stackedTokens = Number(farmData.stackedTokens);
+        farmData.start = Number(farmData.start);
+        farmData.finish = Number(farmData.finish);
+        return farmData;
+    }
 
+    async enterFarmPayload(farm, stackingTIP3UserWallet, rewardTIP3Wallet) {
+        return await this.contract.enterFarm.payload({farm, stackingTIP3UserWallet, rewardTIP3Wallet});
+    }
+
+    async withdrawAllWithPendingRewardPayload(farm) {
+        return await this.contract.withdrawAllWithPendingReward.payload({farm});
+    }
+
+    async createPayload(farm) {
+        return (await this.contract.createPayload({_answer_id:0,
+            farm
+        })).value0;
+    }
 }
 
 

@@ -3,6 +3,9 @@ const CONFIG = {
     "rewardTIP3Root": "0:d9628e635d0aba9774be19703ce0abeb028cabecd3c5e24a38561f89fc76dffd",
     "userAccount": "0:6dd0cb3ac449fd55f0cc662ba7aed2768c9cf0a502daf87d5e31ca20b9a9edb8",
     "stakingContract": "0:701626ff3cd72ec7fa76a8e2f8fec7a8631f372058bbe1556d447691969b94bc",
+    farms: [
+        {name: 'Farm 1', address: "0:701626ff3cd72ec7fa76a8e2f8fec7a8631f372058bbe1556d447691969b94bc"},
+    ],
     //Server address used by default
     defaultNetworkServer: 'net1.ton.dev',
     //Name of network used by default

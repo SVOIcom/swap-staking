@@ -47,11 +47,12 @@ export default {
         async enterStake(button) {
             console.log(button);
             let farm = button.attrs.farm;
+            let decimals = Number(button.attrs.decimals);
             let userFarmData = await this.userAccount.getUserFarmInfo(farm);
             let localFarmContract = await (new FarmContract(TON, CONFIG)).init(farm);
             let farmData = await localFarmContract.fetchInfo(farm);
 
-            console.log('FARM DATA', farmData);
+            console.log('FARM DATA', farmData, decimals);
 
             let stakingTokenRootContract = await (new TokenRootContract(TON, CONFIG)).init(farmData.stackingTIP3Root);
             let rewardTokenRootContract = await (new TokenRootContract(TON, CONFIG)).init(farmData.rewardTIP3Root);
@@ -97,7 +98,7 @@ export default {
 
                 let amount = prompt('Token amount to stake', 1);
 
-                amount = utils.numberToUnsignedNumber(amount);
+                amount = utils.numberToUnsignedNumber(amount, decimals);
 
                 let userStakingTip3Wallet = await (new TokenWalletContract(TON, CONFIG)).init(stakeAddress);
 
@@ -206,8 +207,8 @@ export default {
                     console.log('FARM DATA', farmData);
 
                     let farmHtml = `<h4>${farm.name}</h4>
-                         <p>Pending: ${utils.fixZeroes(utils.unsignedNumberToSigned(farmData.pendingReward))}</p>
-                         <p>Tokens in stake: ${utils.fixZeroes(utils.unsignedNumberToSigned(farmData.stackedTokens))}</p>
+                         <p>Pending: ${utils.fixZeroes(utils.unsignedNumberToSigned(farmData.pendingReward, farm.rewardDecimals))}</p>
+                         <p>Tokens in stake: ${utils.fixZeroes(utils.unsignedNumberToSigned(farmData.stackedTokens, farm.stakeDecimals))}</p>
                         <br>`;
 
                     if(farmData.finish !== 0) {
@@ -215,7 +216,7 @@ export default {
                     }
 
                     if(farmData.stackedTokens === 0) {
-                        farmHtml += `<fw-component type="PrimaryButton" @click="enterStake" farm="${farm.address}">Enter stake</fw-component>`;
+                        farmHtml += `<fw-component type="PrimaryButton" @click="enterStake" farm="${farm.address}" decimals="${farm.stakeDecimals}">Enter stake</fw-component>`;
                     }
 
                     /* if(farmData.stackedTokens !== 0) {

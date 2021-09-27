@@ -211,7 +211,7 @@ export default {
                         <br>`;
 
                     if(farmData.finish !== 0) {
-                        farmHtml += `<p>Stake ending date:</p> ${(new Date(farmData.finish * 1000)).toLocaleString()}`;
+                        farmHtml += `<p>Stake ending date: ${(new Date(farmData.finish * 1000)).toLocaleString()}</p><br>`;
                     }
 
                     if(farmData.stackedTokens === 0) {

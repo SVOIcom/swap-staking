@@ -38,6 +38,11 @@ class FarmContract {
 
     }
 
+    async fetchInfo() {
+        return (await this.contract.fetchInfo({_answer_id: 0})).value0;
+
+    }
+
     async deployUserAccountPayload(walletAddress){
         return await this.contract.deployUserAccount.payload({userAccountOwner: walletAddress});
     }

@@ -47,13 +47,37 @@ export default {
         async enterStake(button) {
             console.log(button);
             let farm = button.attrs.farm;
-            let farmData = await this.userAccount.getUserFarmInfo(farm);
+            let userFarmData = await this.userAccount.getUserFarmInfo(farm);
+            let localFarmContract = await (new FarmContract(TON, CONFIG)).init(farm);
+            let farmData = await localFarmContract.fetchInfo(farm);
 
-            let stakingTokenRootContract = await (new TokenRootContract(TON, CONFIG)).init(CONFIG.stakingTIP3Root);
-            let rewardTokenRootContract = await (new TokenRootContract(TON, CONFIG)).init(CONFIG.rewardTIP3Root);
+            console.log('FARM DATA', farmData);
+
+            let stakingTokenRootContract = await (new TokenRootContract(TON, CONFIG)).init(farmData.stackingTIP3Root);
+            let rewardTokenRootContract = await (new TokenRootContract(TON, CONFIG)).init(farmData.rewardTIP3Root);
 
             let stakeAddress = await stakingTokenRootContract.getWalletAddress();
             let rewardAddress = await rewardTokenRootContract.getWalletAddress();
+
+
+            console.log('USER WALLETS', stakeAddress, rewardAddress);
+
+            try {
+                let wallet = await (new TokenWalletContract(TON, CONFIG)).init(stakeAddress);
+                await wallet.getBalance();
+            } catch (e) {
+                await this.page.popups.error('Error', 'Stake wallet not deployed ' + stakeAddress + '.\n<br>Deploy wallet for token ' + farmData.stackingTIP3Root + ' first');
+                return;
+            }
+
+            try {
+                let wallet = await (new TokenWalletContract(TON, CONFIG)).init(rewardAddress);
+                await wallet.getBalance();
+            } catch (e) {
+                await this.page.popups.error('Error', 'Reward wallet not deployed ' + rewardAddress + '.\n<br>Deploy wallet for token ' + farmData.rewardTIP3Root + ' first');
+                return;
+            }
+
 
             //TODO check wallets exists
 
@@ -79,7 +103,7 @@ export default {
 
                 let userAccountPayload = await this.userAccount.createPayload(farm);
                 console.log('PAYLOAD1', userAccountPayload);
-                let transferPayload = await userStakingTip3Wallet.transferPayload(farmData.stackingTIP3Wallet, amount, userAccountPayload);
+                let transferPayload = await userStakingTip3Wallet.transferPayload(userFarmData.stackingTIP3Wallet, amount, userAccountPayload);
                 console.log('PAYLOAD2', transferPayload)
 
                 let enterStakeResult = await TON.walletTransfer(stakeAddress, 2e9, transferPayload)
@@ -185,6 +209,10 @@ export default {
                          <p>Pending: ${utils.fixZeroes(utils.unsignedNumberToSigned(farmData.pendingReward))}</p>
                          <p>Tokens in stake: ${utils.fixZeroes(utils.unsignedNumberToSigned(farmData.stackedTokens))}</p>
                         <br>`;
+
+                    if(farmData.finish !== 0) {
+                        farmHtml += `<p>Stake ending date:</p> ${(new Date(farmData.finish * 1000)).toLocaleString()}`;
+                    }
 
                     if(farmData.stackedTokens === 0) {
                         farmHtml += `<fw-component type="PrimaryButton" @click="enterStake" farm="${farm.address}">Enter stake</fw-component>`;

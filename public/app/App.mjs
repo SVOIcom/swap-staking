@@ -109,6 +109,7 @@ async function main() {
         delete localStorage.wallet;
         await TON.revokePermissions();
         window.location.href = window.location.href;
+        window.location.reload();
     }
 
     /**
@@ -127,11 +128,13 @@ async function main() {
     window.connectTonWallet = async function () {
         localStorage.wallet = PROVIDERS.TonWallet;
         window.location.href = window.location.href;
+        window.location.reload();
     }
 
     window.connectTonWeb = async function () {
         localStorage.wallet = PROVIDERS.TonWeb;
         window.location.href = window.location.href;
+        window.location.reload();
     }
 
 

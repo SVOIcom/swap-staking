@@ -9270,6 +9270,9 @@ input[type="number"] {
     padding: 15px;
     display: inline-block;
 }
+.btn-block{
+    display: block;
+}
 
 .modal-content{
     background: #434343;
